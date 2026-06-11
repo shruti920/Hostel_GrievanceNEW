@@ -18,7 +18,7 @@ export const STAFF_MAPPING = {
     role: "warden",
     hostelCode: "MHR",
   },
-  "24mm01029@iitbbs.ac.in": {
+  "24mm01089@iitbbs.ac.in": {
     role: "hall_office",
     hostelCode: "BHR",
   },

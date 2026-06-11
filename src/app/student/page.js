@@ -3,7 +3,9 @@ import Link from "next/link";
 import { getStudentComplaints } from "@/lib/complaints";
 import { getServerSession } from "next-auth";
 import { authConfig } from "@/lib/auth";
-import { getUserById } from "@/lib/users";
+import { getUserByEmail } from "@/lib/users";
+import { redirect } from "next/navigation";
+import { getHostelById } from "@/lib/hostels";
 
 
 
@@ -25,16 +27,23 @@ function StatusBadge({ status }) {
 }
 
 export default async function StudentPage() {
-  const session = await getServerSession(authConfig);
-  const user =
-  await getUserById(
-    session.user.id
-  );
+  const session = await getServerSession(authConfig)
+  const user = await getUserByEmail(
+  session.user.email
+);
 
+if (!user) {
+  redirect("/");
+}
 const complaints =
   await getStudentComplaints(
-    session.user.id
+    user.id
   );
+
+const hostel =
+  user.hostel_id
+    ? await getHostelById(user.hostel_id)
+    : null;
 
   const total      = complaints.length;
   const pending    = complaints.filter((c) => c.status === "Pending").length;
@@ -131,7 +140,10 @@ const complaints =
   {/* Fields */}
   <div className="grid md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-gray-100">
     {[
-      { label: "Hostel",      value: user.hostels?.code  || "Not set" },
+     {
+  label: "Hostel",
+  value: hostel?.name || hostel?.code || "Not set",
+},
       { label: "Block / Wing", value: user.block         || "Not set" },
       { label: "Room number",  value: user.room_number   || "Not set" },
     ].map((field) => (
